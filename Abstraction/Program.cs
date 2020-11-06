@@ -6,44 +6,64 @@ namespace Abstraction
 {
     class Program
     {
-        static int size = 5;
-        static string[] stringStack = new string[size];
-        static int place = -1;
-
         static void Main()
         {
-            Push("m");
-            Push("B");
-            Pop();
-            Push("o");
-            Push("o");
-            Pop();
-            Pop();
-            Pop();
-            Pop();
+            // StackBoom
             Console.Read();
         }
 
-        static void Push(string input)
+        static void StackBoom()
         {
-            if (place != size)
-            {
-                place++;
-                stringStack[place] = input;
-            }
+            MyStack<string> stack = new MyStack<string>(10);
+            stack.Push("m");
+            stack.Push("B");
+            Console.WriteLine(stack.Pop());
+            stack.Push("o");
+            stack.Push("o");
+            Console.WriteLine(stack.Pop());
+            Console.WriteLine(stack.Pop());
+            Console.WriteLine(stack.Pop());
+            stack.Pop();
         }
-        
-        static void Pop()
+    }
+
+    public class MyStack <T>
+    {
+        public static int Length;
+        public static int Current;
+        private static T[] StackBody;
+
+        public MyStack(int length)
         {
-            if (place != -1)
+            Length = length;
+            Current = -1;
+            StackBody = new T[length];
+        }
+
+        public T Pop()
+        {
+            if (Current == -1)
             {
-                Console.WriteLine(stringStack[place]);
-                stringStack[place] = "";
-                place--;
+                throw new Exception("Stack Underflow");
             }
             else
             {
-                Console.WriteLine("Error: Empty stack");
+                T result = StackBody[Current];
+                Current--;
+                return result;
+            }
+        }
+
+        public void Push(T input)
+        {
+            if (Current == Length)
+            {
+                throw new Exception("Stack Overflow");
+            }
+            else
+            {
+                Current++;
+                StackBody[Current] = input;
             }
         }
     }
