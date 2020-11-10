@@ -8,8 +8,51 @@ namespace Abstraction
     {
         static void Main()
         {
-            // StackBoom
+            // StackBoom();
+            Console.WriteLine(RPNStackMaths(new object[] { 5, 4, "*", 2, 3, "-", "*" }));
             Console.Read();
+        }
+
+        static int RPNStackMaths(object[] equation)
+        {
+            MyStack<int> stack = new MyStack<int>(equation.Length);
+            for(int i = 0; i!=equation.Length; i++)
+            {
+                if(int.TryParse(equation[i].ToString(), out int c))
+                {
+                    stack.Push(c);
+                }
+                else
+                {
+                    int a = stack.Pop();
+                    int b = stack.Pop();
+                    if(equation[i].ToString() == "+")
+                    {
+                        c = a + b;
+                    }
+                    else if (equation[i].ToString() == "-")
+                    {
+                        c = a - b;
+                    }
+                    else if (equation[i].ToString() == "*")
+                    {
+                        c = a * b;
+                    }
+                    else if (equation[i].ToString() == "/")
+                    {
+                        c = a / b;
+                    }
+                    stack.Push(c);
+                }
+            }
+            if(stack.Pointer() != 0)
+            {
+                throw new InvalidOperationException("Input is not in RPN format");
+            }
+            else
+            {
+                return stack.Pop();
+            }
         }
 
         static void StackBoom()
@@ -65,6 +108,16 @@ namespace Abstraction
                 Current++;
                 StackBody[Current] = input;
             }
+        }
+
+        public int Size()
+        {
+            return Length;
+        }
+
+        public int Pointer()
+        {
+            return Current;
         }
     }
 }
