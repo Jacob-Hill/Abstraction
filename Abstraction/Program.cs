@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Abstraction
@@ -9,16 +10,80 @@ namespace Abstraction
         static void Main()
         {
             // StackBoom();
+            Console.WriteLine(RPNStackMaths(ShuntingYardAlgorithm(new object[] { 4, "*", 5, "*", "(", 3, "-", 2, ")" })));
             Console.WriteLine(RPNStackMaths(new object[] { 5, 4, "*", 2, 3, "-", "*" }));
             Console.Read();
         }
 
-        static int RPNStackMaths(object[] equation)
+        static object[] ShuntingYardAlgorithm(object[] infixEquation)
         {
-            MyStack<int> stack = new MyStack<int>(equation.Length);
-            for(int i = 0; i!=equation.Length; i++)
+            List<object> output = new List<object> { };
+            MyStack<string> operatorStack = new MyStack<string>();
+            for(int i = 0; i<infixEquation.Length; i++)
             {
-                if(int.TryParse(equation[i].ToString(), out int c))
+                if (int.TryParse(infixEquation[i].ToString(), out int c))
+                {
+                    output.Add(infixEquation[i]);
+                }
+                else
+                {
+                    if(infixEquation[i].ToString() == "+")
+                    {
+                        if (operatorStack.IsEmpty())
+                        {
+                            if(operatorStack.Top().ToString() == "*" || operatorStack.Top().ToString() == "/")
+                            {
+                                output.Add(operatorStack.Pop());
+                            }
+                        }
+                        operatorStack.Push("+");
+                    }
+                    else if (infixEquation[i].ToString() == "-")
+                    {
+                        if (operatorStack.IsEmpty())
+                        {
+                            if (operatorStack.Top().ToString() == "*" || operatorStack.Top().ToString() == "/")
+                            {
+                                output.Add(operatorStack.Pop());
+                            }
+                        }
+                        operatorStack.Push("-");
+                    }
+                    else if (infixEquation[i].ToString() == "*")
+                    {
+                        operatorStack.Push("*");
+                    }
+                    else if (infixEquation[i].ToString() == "/")
+                    {
+                        operatorStack.Push("/");
+                    }
+                    else if (infixEquation[i].ToString() == "(")
+                    {
+                        operatorStack.Push("(");
+                    }
+                    else if (infixEquation[i].ToString() == ")")
+                    {
+                        while (operatorStack.Top() != "(")
+                        {
+                            output.Add(operatorStack.Pop());
+                        }
+                        operatorStack.Pop();
+                    }
+                }
+            }
+            while(!operatorStack.IsEmpty())
+            {
+                output.Add(operatorStack.Pop());
+            }
+            return output.ToArray();
+        }
+
+        static int RPNStackMaths(object[] RPNEquation)
+        {
+            MyStack<int> stack = new MyStack<int>(RPNEquation.Length);
+            for(int i = 0; i!=RPNEquation.Length; i++)
+            {
+                if(int.TryParse(RPNEquation[i].ToString(), out int c))
                 {
                     stack.Push(c);
                 }
@@ -26,32 +91,33 @@ namespace Abstraction
                 {
                     int a = stack.Pop();
                     int b = stack.Pop();
-                    if(equation[i].ToString() == "+")
+                    if(RPNEquation[i].ToString() == "+")
                     {
                         c = a + b;
                     }
-                    else if (equation[i].ToString() == "-")
+                    else if (RPNEquation[i].ToString() == "-")
                     {
                         c = a - b;
                     }
-                    else if (equation[i].ToString() == "*")
+                    else if (RPNEquation[i].ToString() == "*")
                     {
                         c = a * b;
                     }
-                    else if (equation[i].ToString() == "/")
+                    else if (RPNEquation[i].ToString() == "/")
                     {
                         c = a / b;
                     }
                     stack.Push(c);
                 }
             }
-            if(stack.Pointer() != 0)
+            int result = stack.Pop();
+            if(! stack.IsEmpty())
             {
                 throw new InvalidOperationException("Input is not in RPN format");
             }
             else
             {
-                return stack.Pop();
+                return result;
             }
         }
 
@@ -75,6 +141,13 @@ namespace Abstraction
         public static int Length;
         public static int Current;
         private static T[] StackBody;
+
+        public MyStack()
+        {
+            Length = 1000;
+            Current = -1;
+            StackBody = new T[1000];
+        }
 
         public MyStack(int length)
         {
@@ -115,9 +188,19 @@ namespace Abstraction
             return Length;
         }
 
-        public int Pointer()
+        public bool IsFull()
         {
-            return Current;
+            return Current==Length;
+        }
+
+        public bool IsEmpty()
+        {
+            return Current == -1;
+        }
+
+        public T Top()
+        {
+            return StackBody[Current];
         }
     }
 }
