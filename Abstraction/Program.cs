@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Abstraction
 {
@@ -10,9 +8,35 @@ namespace Abstraction
         static void Main()
         {
             // StackBoom();
-            Console.WriteLine(RPNStackMaths(ShuntingYardAlgorithm(new object[] { 4, "*", 5, "*", "(", 3, "-", 2, ")" })));
-            Console.WriteLine(RPNStackMaths(new object[] { 5, 4, "*", 2, 3, "-", "*" }));
+            //Console.WriteLine(RPNStackMaths(ShuntingYardAlgorithm(new object[] { 4, "*", 5, "*", 3, "-", 2 })));
+            //Console.WriteLine(RPNStackMaths(new object[] { 5, 4, "*", 2, 3, "-", "*" }));
+            //Jobs();
             Console.Read();
+        }
+
+        static void Jobs()
+        {
+            MyQueue<string> queue = new MyQueue<string>();
+            bool moreJobs = true;
+            while (moreJobs)
+            {
+                Console.WriteLine("Would you like to see your next job?");
+                if (Console.ReadLine().ToLower() == "yes")
+                {
+                    Console.WriteLine(queue.Dequeue());
+                }
+                Console.WriteLine("Would you like to add a job?");
+                if (Console.ReadLine().ToLower() == "yes")
+                {
+                    Console.Write("Job: ");
+                    queue.Enqueue(Console.ReadLine());
+                }
+                Console.WriteLine("Continue?");
+                if (Console.ReadLine().ToLower() == "no")
+                {
+                    moreJobs = false;
+                }
+            }
         }
 
         static object[] ShuntingYardAlgorithm(object[] infixEquation)
@@ -201,6 +225,59 @@ namespace Abstraction
         public T Top()
         {
             return StackBody[Current];
+        }
+    }
+
+    public class MyQueue<T>
+    {
+        int tail = -1;
+        int head = 0;
+        int length;
+        T[] queueBody;
+
+        public MyQueue()
+        {
+            length = 5;
+            queueBody = new T[length];
+        }
+
+        public MyQueue(int Length)
+        {
+            length = Length;
+            queueBody = new T[length];
+        }
+
+        public void Enqueue(T input)
+        {
+            if((tail+1)%length==0 && tail != -1)
+            {
+                throw new Exception("Queue Overflow");
+            }
+            else
+            {
+                tail++;
+                queueBody[tail] = input;
+            }
+        }
+
+        public T Dequeue()
+        {
+            if ((tail + 1) % length == head)
+            {
+                throw new Exception("Queue Underflow");
+            }
+            else
+            {
+                T result = queueBody[head];
+                tail = (tail + 1) % length;
+                head = (head + 1) % length;
+                return result;
+            }
+        }
+
+        public int Length()
+        {
+            return length;
         }
     }
 }
