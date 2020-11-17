@@ -10,13 +10,18 @@ namespace Abstraction
             // StackBoom();
             //Console.WriteLine(RPNStackMaths(ShuntingYardAlgorithm(new object[] { 4, "*", 5, "*", 3, "-", 2 })));
             //Console.WriteLine(RPNStackMaths(new object[] { 5, 4, "*", 2, 3, "-", "*" }));
-            //Jobs();
+            Jobs();
             Console.Read();
+        }
+
+        static void DirectoryList()
+        {
+
         }
 
         static void Jobs()
         {
-            MyQueue<string> queue = new MyQueue<string>();
+            MyQueue<string> queue = new MyQueue<string>(5);
             bool moreJobs = true;
             while (moreJobs)
             {
@@ -231,13 +236,13 @@ namespace Abstraction
     public class MyQueue<T>
     {
         int tail = -1;
-        int head = 0;
+        int head = -1;
         int length;
         T[] queueBody;
 
         public MyQueue()
         {
-            length = 5;
+            length = 1000;
             queueBody = new T[length];
         }
 
@@ -249,28 +254,42 @@ namespace Abstraction
 
         public void Enqueue(T input)
         {
-            if((tail+1)%length==0 && tail != -1)
+            if ((tail + 1) % length == head) 
             {
                 throw new Exception("Queue Overflow");
             }
             else
             {
-                tail++;
+                if (head == -1)
+                {
+                    head = 0;
+                }
+                tail = (tail + 1) % length;
                 queueBody[tail] = input;
             }
         }
 
         public T Dequeue()
         {
-            if ((tail + 1) % length == head)
+            if ((tail + 1) % length == head) 
             {
                 throw new Exception("Queue Underflow");
             }
             else
             {
-                T result = queueBody[head];
-                tail = (tail + 1) % length;
-                head = (head + 1) % length;
+                T result;
+                if (head == tail)
+                {
+                    result = queueBody[head];
+                    head = -1;
+                    tail = -1;
+                }
+                else
+                {
+                    result = queueBody[head];
+                    head = (head + 1) % length;
+                }
+                
                 return result;
             }
         }
